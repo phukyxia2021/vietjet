@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Tiết Chuyến Bay & Chọn Hạng Vé | Vietjet</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/flights.css">
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="top-bar">
+    <div class="container">
+      <div>
+        <i class="fas fa-shield-alt" style="color: var(--primary);"></i> Đặt vé an toàn - Cam kết giá vé minh bạch & Hỗ trợ 24/7
+      </div>
+      <div class="top-bar-links">
+        <a href="javascript:void(0)" onclick="VietjetDB.reloadFromDisk()" style="color: var(--primary); font-weight: 700;" title="Nhấn để nạp lại dữ liệu mới nhất từ file db.db"><i class="fas fa-sync-alt"></i> Đồng Bộ CSDL</a>
+        <a href="tel:19001886"><i class="fas fa-phone-alt"></i> 1900 1886</a>
+        <a href="cart.html"><i class="fas fa-shopping-bag"></i> Giỏ Hàng (<span class="cart-badge" style="display:inline-block; position:static;">0</span>)</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo">
+        <img src="images/logo.jpg" alt="Vietjet Logo">
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="index.html"><i class="fas fa-home"></i> Trang Chủ</a></li>
+          <li class="nav-item active"><a href="flights.html"><i class="fas fa-plane"></i> Chuyến Bay</a></li>
+          <li class="nav-item"><a href="tours.html"><i class="fas fa-umbrella-beach"></i> Tour Du Lịch</a></li>
+          <li class="nav-item"><a href="cart.html"><i class="fas fa-shopping-bag"></i> Giỏ Hàng</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="hotline-pill">
+          <i class="fas fa-headset"></i> 1900 1886
+        </div>
+        <a href="cart.html" class="cart-btn" title="Xem giỏ hàng">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="container" style="margin-top: 24px;">
+    <a href="flights.html" class="btn btn-outline btn-sm" style="margin-bottom: 20px;">
+      <i class="fas fa-arrow-left"></i> Quay lại danh sách chuyến bay
+    </a>
+  </div>
+
+  <!-- MAIN DETAIL CONTENT -->
+  <div class="container" id="flightDetailContainer">
+    <div style="text-align: center; padding: 60px 20px;">
+      <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+      <p style="margin-top: 12px; color: var(--text-muted);">Đang tải thông tin chuyến bay từ SQLite...</p>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div class="modal-overlay" id="addToCartModal">
+    <div class="modal-box" style="text-align: center; padding: 36px 28px;">
+      <div style="width: 64px; height: 64px; background: #eafaf1; color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+        <i class="fas fa-check"></i>
+      </div>
+      <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Đã Thêm Vào Giỏ Hàng!</h3>
+      <p style="color: var(--text-muted); margin-bottom: 24px;" id="modalSuccessMessage">
+        Chuyến bay của bạn đã được ghi nhận vào hệ thống SQLite.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <a href="flights.html" class="btn btn-outline">
+          <i class="fas fa-search"></i> Chọn Chuyến Khác
+        </a>
+        <a href="cart.html" class="btn btn-primary">
+          <i class="fas fa-shopping-cart"></i> Đến Giỏ Hàng & Đăng Ký
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none; padding:0;">
+        <div>© 2026 Vietjet Aviation. Dữ liệu chuyến bay từ CSDL SQLite client-side.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SQLite + Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <script src="assets/js/db-fallback.js"></script>
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    let currentFlight = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      App.setupNav();
+
+      try {
+        await VietjetDB.init();
+        loadFlightDetail();
+        CartService.notifyUpdate();
+      } catch (err) {
+        console.error('Lỗi nạp chi tiết chuyến bay:', err);
+      }
+    });
+
+    function loadFlightDetail() {
+      const flightId = App.getUrlParam('id');
+      const container = document.getElementById('flightDetailContainer');
+
+      if (!flightId) {
+        container.innerHTML = `
+          <div style="background: #fff; padding: 40px; text-align: center; border-radius: 12px; border: 1px solid var(--border-light);">
+            <h3>Không tìm thấy mã chuyến bay!</h3>
+            <p style="color: var(--text-muted); margin: 12px 0 20px;">Vui lòng chọn chuyến bay từ danh sách tìm kiếm.</p>
+            <a href="flights.html" class="btn btn-primary">Quay lại danh sách</a>
+          </div>
+        `;
+        return;
+      }
+
+      const sql = `
+        SELECT 
+          f.*,
+          a.name AS airline_name,
+          a.code AS airline_code,
+          a.logo AS airline_logo,
+          orig.city_name AS origin_city,
+          orig.airport_name AS origin_airport,
+          dest.city_name AS destination_city,
+          dest.airport_name AS destination_airport
+        FROM flights f
+        JOIN airlines a ON f.airline_id = a.id
+        JOIN airports orig ON f.origin_code = orig.code
+        JOIN airports dest ON f.destination_code = dest.code
+        WHERE f.id = ?
+      `;
+
+      const results = VietjetDB.query(sql, [flightId]);
+      if (!results || results.length === 0) {
+        container.innerHTML = `
+          <div style="background: #fff; padding: 40px; text-align: center; border-radius: 12px;">
+            <h3>Chuyến bay không tồn tại trong CSDL!</h3>
+            <a href="flights.html" class="btn btn-primary" style="margin-top: 16px;">Xem chuyến bay khác</a>
+          </div>
+        `;
+        return;
+      }
+
+      currentFlight = results[0];
+      renderFlightDetail(currentFlight);
+    }
+
+    function renderFlightDetail(f) {
+      const container = document.getElementById('flightDetailContainer');
+      const flightDate = App.getUrlParam('date') || 'Hàng ngày';
+
+      container.innerHTML = `
+        <!-- KHỐI TỔNG QUAN LỘ TRÌNH CHUYẾN BAY -->
+        <div class="detail-overview-box">
+          <div class="detail-route-header">
+            <div>
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <img src="${f.airline_logo}" alt="${f.airline_name}" style="max-height: 38px;" onerror="this.src='images/logo.jpg'">
+                <div>
+                  <h2 style="font-size: 22px; font-weight: 800; color: var(--text-dark);">${f.airline_name}</h2>
+                  <span style="font-size: 13px; color: var(--text-muted);">Số hiệu: <strong>${f.flight_number}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loại máy bay thực tế: Boeing / Airbus -->
+            <div class="aircraft-badge">
+              <i class="fas fa-plane" style="color: var(--primary);"></i> 
+              Loại máy bay: <strong>${f.aircraft_type}</strong>
+            </div>
+          </div>
+
+          <!-- Sơ đồ lộ trình bay -->
+          <div class="flight-schedule" style="padding: 20px 0; border-bottom: 1.5px solid var(--border-light);">
+            <div class="schedule-point" style="text-align: left;">
+              <div class="schedule-time" style="font-size: 28px;">${f.departure_time}</div>
+              <div style="font-size: 16px; font-weight: 800; color: var(--text-dark);">${f.origin_city} (${f.origin_code})</div>
+              <div class="schedule-airport">${f.origin_airport}</div>
+            </div>
+
+            <div class="flight-duration-track">
+              <div class="duration-text" style="font-size: 14px;"><i class="far fa-clock"></i> Thời gian bay: ${App.formatDuration(f.duration_minutes)}</div>
+              <div class="flight-track-line" style="margin: 8px 0;">
+                <i class="fas fa-plane"></i>
+              </div>
+              <div class="flight-direct-tag" style="font-size: 13px;">
+                <i class="fas fa-check-circle"></i> Bay thẳng không dừng • Ngày bay: ${flightDate}
+              </div>
+            </div>
+
+            <div class="schedule-point" style="text-align: right;">
+              <div class="schedule-time" style="font-size: 28px;">${f.arrival_time}</div>
+              <div style="font-size: 16px; font-weight: 800; color: var(--text-dark);">${f.destination_city} (${f.destination_code})</div>
+              <div class="schedule-airport">${f.destination_airport}</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-muted);">
+            <div><i class="fas fa-chair" style="color: var(--primary);"></i> Còn trống: <strong>${f.seats_available} ghế</strong></div>
+            <div><i class="fas fa-info-circle"></i> Vui lòng có mặt tại sân bay trước giờ khởi hành 90 phút</div>
+          </div>
+        </div>
+
+        <!-- KHỐI CHỌN GIÁ VÉ: PHỔ THÔNG VS THƯƠNG GIA -->
+        <div class="fare-classes-section">
+          <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+            <span class="section-tag">LỰA CHỌN HẠNG DỊCH VỤ</span>
+            <h2 class="section-title">Chọn Giá Vé Phù Hợp Với Nhu Cầu Của Bạn</h2>
+            <p class="section-desc" style="margin: 0;">Mỗi hạng vé mang lại quyền lợi và dịch vụ riêng biệt. Chọn hạng vé để thêm vào giỏ hàng.</p>
+          </div>
+
+          <div class="fare-classes-grid">
+
+            <!-- 1. HẠNG PHỔ THÔNG (ECONOMY) -->
+            <div class="fare-card">
+              <div class="fare-card-header">
+                <div class="fare-card-name">
+                  <i class="fas fa-user" style="color: var(--text-muted);"></i> Hạng Phổ Thông (Eco)
+                </div>
+                <div class="fare-card-price">
+                  ${App.formatVND(f.price_economy)} <span>/ khách</span>
+                </div>
+              </div>
+
+              <ul class="fare-features-list">
+                <li class="fare-feature-item">
+                  <i class="fas fa-check"></i>
+                  <span><strong>Hành lý xách tay:</strong> 07 kg tiêu chuẩn</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-check"></i>
+                  <span><strong>Ghế ngồi:</strong> Tiêu chuẩn khoang phổ thông êm ái</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-check"></i>
+                  <span><strong>Nước uống:</strong> Miễn phí trên chuyến bay</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-info-circle" style="color: #6c757d;"></i>
+                  <span><strong>Hành lý ký gửi:</strong> Mua thêm theo gói 20kg - 30kg</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-info-circle" style="color: #6c757d;"></i>
+                  <span><strong>Thay đổi chuyến bay:</strong> Thu phí đổi + chênh lệch giá vé</span>
+                </li>
+              </ul>
+
+              <div class="fare-card-footer">
+                <button type="button" class="btn btn-outline btn-block" onclick="selectFareClass('economy')">
+                  <i class="fas fa-plus-circle"></i> Chọn Hạng Phổ Thông
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. HẠNG THƯƠNG GIA (BUSINESS / SKYBOSS) -->
+            <div class="fare-card business-card">
+              <span class="fare-card-badge"><i class="fas fa-crown"></i> CAO CẤP</span>
+
+              <div class="fare-card-header">
+                <div class="fare-card-name" style="color: #b08200;">
+                  <i class="fas fa-crown"></i> Hạng Thương Gia (SkyBoss / Business)
+                </div>
+                <div class="fare-card-price" style="color: #ee1d23;">
+                  ${App.formatVND(f.price_business)} <span>/ khách</span>
+                </div>
+              </div>
+
+              <ul class="fare-features-list">
+                <li class="fare-feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span><strong>Hành lý vượt trội:</strong> 14kg xách tay + 30kg - 40kg ký gửi miễn phí</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span><strong>Phòng chờ VIP:</strong> Tận hưởng phòng chờ hạng sang tại sân bay (Lounge)</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span><strong>Ưu tiên cao cấp:</strong> Quầy check-in riêng, lối đi an ninh ưu tiên, xe riêng đưa đón ra máy bay</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span><strong>Ẩm thực:</strong> Miễn phí suất ăn nóng sốt và đồ uống cao cấp</span>
+                </li>
+                <li class="fare-feature-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span><strong>Linh hoạt:</strong> Miễn phí thay đổi ngày bay, giờ bay và hành trình</span>
+                </li>
+              </ul>
+
+              <div class="fare-card-footer">
+                <button type="button" class="btn btn-primary btn-block" onclick="selectFareClass('business')">
+                  <i class="fas fa-check-circle"></i> Chọn Hạng Thương Gia
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    // Xử lý khi người dùng chọn hạng vé -> Lưu vào SQLite Cart
+    function selectFareClass(ticketClass) {
+      if (!currentFlight) return;
+
+      const success = CartService.addFlight(currentFlight.id, ticketClass, 1);
+      if (success) {
+        const className = (ticketClass === 'business') ? 'Hạng Thương Gia (SkyBoss)' : 'Hạng Phổ Thông (Eco)';
+        document.getElementById('modalSuccessMessage').innerHTML = `
+          Đã thêm chuyến bay <strong>${currentFlight.flight_number}</strong> (${currentFlight.origin_code} ➔ ${currentFlight.destination_code}) 
+          - <strong>${className}</strong> vào Giỏ Hàng thành công!
+        `;
+        document.getElementById('addToCartModal').classList.add('active');
+      } else {
+        App.showToast('Không thể thêm chuyến bay vào giỏ hàng!', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

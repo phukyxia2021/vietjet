@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giỏ Hàng & Đăng Ký Đặt Vé | Vietjet</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/cart.css">
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="top-bar">
+    <div class="container">
+      <div>
+        <i class="fas fa-lock" style="color: var(--primary);"></i> Thanh toán an toàn & bảo mật trực tuyến - <strong>Vietjet</strong>
+      </div>
+      <div class="top-bar-links">
+        <a href="tel:19001886"><i class="fas fa-phone-alt"></i> 1900 1886</a>
+        <a href="mailto:nvhai061993@gmail.com"><i class="fas fa-envelope"></i> nvhai061993@gmail.com</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo">
+        <img src="images/logo.jpg" alt="Vietjet Logo">
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="index.html"><i class="fas fa-home"></i> Trang Chủ</a></li>
+          <li class="nav-item"><a href="flights.html"><i class="fas fa-plane"></i> Chuyến Bay</a></li>
+          <li class="nav-item"><a href="tours.html"><i class="fas fa-umbrella-beach"></i> Tour Du Lịch</a></li>
+          <li class="nav-item active"><a href="cart.html"><i class="fas fa-shopping-bag"></i> Giỏ Hàng</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="hotline-pill">
+          <i class="fas fa-headset"></i> 1900 1886
+        </div>
+        <a href="cart.html" class="cart-btn" title="Xem giỏ hàng">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <div style="background: #f8f9fa; border-bottom: 1px solid var(--border-light); padding: 24px 0;">
+    <div class="container">
+      <h1 style="font-size: 26px; font-weight: 800; color: var(--text-dark);">
+        <i class="fas fa-shopping-cart" style="color: var(--primary);"></i> Giỏ Hàng & Xác Nhận Đăng Ký
+      </h1>
+      <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+        Vui lòng kiểm tra lại chuyến bay, tour đã chọn và điền thông tin cá nhân để nhận vé điện tử.
+      </p>
+    </div>
+  </div>
+
+  <!-- MAIN CART & CHECKOUT LAYOUT -->
+  <div class="container cart-page-container">
+    <div class="cart-layout">
+
+      <!-- ==========================================
+           CỘT TRÁI: DANH SÁCH DỊCH VỤ TRONG GIỎ HÀNG
+           ========================================== -->
+      <section class="cart-items-section">
+        <div class="cart-header-row">
+          <div class="cart-header-title">
+            Dịch Vụ Đã Chọn (<span id="cartCountHeader">0</span>)
+          </div>
+          <button type="button" class="btn-clear-all" onclick="confirmClearCart()">
+            <i class="fas fa-trash-alt"></i> Xóa toàn bộ giỏ hàng
+          </button>
+        </div>
+
+        <!-- Danh sách items -->
+        <div id="cartItemsList">
+          <div style="text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 10px; color: var(--text-muted);">Đang tải giỏ hàng từ SQLite...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           CỘT PHẢI: FORM THÔNG TIN & NÚT ĐĂNG KÝ
+           ========================================== -->
+      <aside class="checkout-card">
+        <div class="checkout-card-title">
+          <i class="fas fa-user-check" style="color: var(--primary);"></i> Thông Tin Khách Hàng
+        </div>
+
+        <form id="checkoutForm" onsubmit="handleRegistration(event)">
+          <!-- Họ và tên -->
+          <div class="form-group">
+            <label class="form-label" for="customerName">Họ và Tên (*)</label>
+            <input type="text" id="customerName" class="form-control" placeholder="Nguyễn Văn A" required>
+          </div>
+
+          <!-- Số điện thoại -->
+          <div class="form-group">
+            <label class="form-label" for="customerPhone">Số Điện Thoại (*)</label>
+            <input type="tel" id="customerPhone" class="form-control" placeholder="0901 234 567" pattern="[0-9]{9,11}" required>
+          </div>
+
+          <!-- Email nhận vé -->
+          <div class="form-group">
+            <label class="form-label" for="customerEmail">Email Nhận Vé Điện Tử (*)</label>
+            <input type="email" id="customerEmail" class="form-control" placeholder="khachhang@email.com" required>
+            <small style="color: var(--text-muted); font-size: 11.5px; display: block; margin-top: 4px;">
+              Email xác nhận sẽ được gửi từ: <strong>nvhai061993@gmail.com</strong>
+            </small>
+          </div>
+
+          <!-- Địa chỉ -->
+          <div class="form-group">
+            <label class="form-label" for="customerAddress">Địa Chỉ</label>
+            <input type="text" id="customerAddress" class="form-control" placeholder="Quận/Huyện, Tỉnh/TP">
+          </div>
+
+          <!-- Ghi chú đặc biệt -->
+          <div class="form-group">
+            <label class="form-label" for="customerNotes">Ghi Chú Đặt Chỗ</label>
+            <textarea id="customerNotes" class="form-control" rows="2" placeholder="Yêu cầu ghế ngồi, suất ăn đặc biệt..."></textarea>
+          </div>
+
+          <!-- Tổng kết thanh toán -->
+          <div style="margin-top: 24px; border-top: 1.5px solid var(--border-light); padding-top: 16px;">
+            <div class="checkout-summary-row">
+              <span>Tạm tính:</span>
+              <span id="summarySubtotal">0 ₫</span>
+            </div>
+            <div class="checkout-summary-row">
+              <span>Thuế & Phí dịch vụ:</span>
+              <span style="color: #28a745;">Miễn phí</span>
+            </div>
+            <div class="checkout-summary-row total-row">
+              <span>TỔNG CỘNG:</span>
+              <span class="checkout-total-val" id="summaryTotal">0 ₫</span>
+            </div>
+          </div>
+
+          <!-- NÚT ĐĂNG KÝ -->
+          <button type="submit" class="btn btn-primary btn-block" id="btnSubmitBooking" style="padding: 16px; font-size: 16px; font-weight: 800; margin-top: 20px;">
+            <i class="fas fa-check-circle"></i> ĐĂNG KÝ & XÁC NHẬN
+          </button>
+        </form>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL THÔNG BÁO HOÀN THÀNH ĐẶT VÉ
+       ========================================== -->
+  <div class="modal-overlay" id="bookingSuccessModal">
+    <div class="modal-box" style="text-align: center; padding: 40px 32px;">
+      <div class="success-check-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h2 style="font-size: 24px; font-weight: 900; color: var(--text-dark); margin-bottom: 6px;">
+        ĐĂNG KÝ THÀNH CÔNG!
+      </h2>
+      <p style="color: var(--text-muted); font-size: 15px;">
+        Cảm ơn Quý khách <strong id="successCustomerName"></strong> đã sử dụng dịch vụ của Vietjet.
+      </p>
+
+      <div class="booking-code-pill" id="successBookingCode">
+        Mã Đặt Chỗ: VJ-XXXXXX
+      </div>
+
+      <!-- Thông báo gửi email từ nvhai061993@gmail.com -->
+      <div class="email-sent-notice">
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <i class="fas fa-envelope-open-text" style="font-size: 22px; color: #b08200; margin-top: 2px;"></i>
+          <div>
+            <strong>Thông Báo Gửi Email Xác Nhận:</strong><br>
+            Một email chứa chi tiết vé điện tử và voucher tour đã được gửi tự động từ 
+            <strong style="color: #ee1d23;">nvhai061993@gmail.com</strong> đến địa chỉ email 
+            <strong style="color: #212529;" id="successCustomerEmail"></strong> của Quý khách.
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button type="button" class="btn btn-outline" onclick="openEmailPreviewModal()">
+          <i class="fas fa-eye"></i> Xem Email Xác Nhận
+        </button>
+        <a href="index.html" class="btn btn-primary">
+          <i class="fas fa-home"></i> Về Trang Chủ
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL XEM TRƯỚC BẢN EMAIL ĐÃ GỬI
+       ========================================== -->
+  <div class="modal-overlay" id="emailPreviewModal">
+    <div class="modal-box" style="max-width: 720px; padding: 0;">
+      <div class="modal-header">
+        <h3><i class="fas fa-envelope" style="color: var(--primary);"></i> Chi Tiết Email Gửi Từ nvhai061993@gmail.com</h3>
+        <button type="button" class="modal-close" onclick="closeEmailPreviewModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="emailPreviewContent" style="padding: 20px; max-height: 75vh; overflow-y: auto;">
+        <!-- Email body injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none; padding:0;">
+        <div>© 2026 Vietjet Travel. Dữ liệu đơn hàng được lưu trực tiếp trong SQLite `bookings`.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SQLite + Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <script src="assets/js/db-fallback.js"></script>
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/email-service.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    let currentCartItems = [];
+    let lastCreatedBooking = null;
+    let lastBookingDetails = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      App.setupNav();
+
+      try {
+        await VietjetDB.init();
+        loadCartData();
+      } catch (err) {
+        console.error('Lỗi nạp giỏ hàng:', err);
+      }
+    });
+
+    // Nạp dữ liệu giỏ hàng từ SQLite
+    function loadCartData() {
+      currentCartItems = CartService.getItems();
+      renderCartUI();
+    }
+
+    function renderCartUI() {
+      const container = document.getElementById('cartItemsList');
+      const countHeader = document.getElementById('cartCountHeader');
+      const submitBtn = document.getElementById('btnSubmitBooking');
+
+      countHeader.textContent = currentCartItems.length;
+
+      if (!currentCartItems || currentCartItems.length === 0) {
+        container.innerHTML = `
+          <div class="empty-cart-state">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Giỏ hàng của bạn đang trống!</h3>
+            <p style="color: var(--text-muted); margin-bottom: 24px;">Hãy chọn các chuyến bay giá tốt hoặc tour du lịch tuyệt vời để tiếp tục.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+              <a href="flights.html" class="btn btn-primary"><i class="fas fa-plane"></i> Tìm Chuyến Bay</a>
+              <a href="tours.html" class="btn btn-outline"><i class="fas fa-umbrella-beach"></i> Khám Phá Tour</a>
+            </div>
+          </div>
+        `;
+        document.getElementById('summarySubtotal').textContent = '0 ₫';
+        document.getElementById('summaryTotal').textContent = '0 ₫';
+        if (submitBtn) submitBtn.disabled = true;
+        CartService.notifyUpdate();
+        return;
+      }
+
+      if (submitBtn) submitBtn.disabled = false;
+
+      let subtotal = 0;
+
+      container.innerHTML = currentCartItems.map(item => {
+        subtotal += Number(item.subtotal);
+        const isFlight = (item.item_type === 'flight');
+        const iconClass = isFlight ? 'fa-plane' : 'fa-umbrella-beach';
+        const typeLabel = isFlight ? 'Chuyến bay' : 'Tour du lịch';
+        const classLabel = (item.ticket_class === 'business') ? 'Hạng Thương Gia (SkyBoss)' : (isFlight ? 'Hạng Phổ Thông' : 'Tiêu chuẩn');
+
+        return `
+          <div class="cart-item-card">
+            <!-- Icon phân loại -->
+            <div class="cart-item-icon">
+              <i class="fas ${iconClass}"></i>
+            </div>
+
+            <!-- Thông tin dịch vụ -->
+            <div class="cart-item-info">
+              <span class="badge ${isFlight ? 'badge-red' : 'badge-yellow'}" style="margin-bottom: 6px;">${typeLabel}</span>
+              <h4>${item.item_title}</h4>
+              <div class="cart-item-meta">
+                <span><i class="fas fa-building"></i> ${item.airline_name || 'VietJet'}</span>
+                <span><i class="fas fa-plane"></i> ${item.aircraft_type || 'Airbus/Boeing'}</span>
+                <span><i class="fas fa-tag"></i> ${classLabel}</span>
+              </div>
+            </div>
+
+            <!-- Tăng giảm số lượng -->
+            <div class="cart-quantity-control">
+              <button type="button" class="qty-btn" onclick="updateItemQuantity(${item.cart_item_id}, ${item.quantity - 1})">-</button>
+              <div class="qty-display">${item.quantity}</div>
+              <button type="button" class="qty-btn" onclick="updateItemQuantity(${item.cart_item_id}, ${item.quantity + 1})">+</button>
+            </div>
+
+            <!-- Giá tiền & Xóa -->
+            <div class="cart-item-price-box">
+              <div class="cart-item-subtotal">${App.formatVND(item.subtotal)}</div>
+              <div class="cart-item-unit-price">${App.formatVND(item.unit_price)} / khách</div>
+              <button type="button" class="btn-remove-item" onclick="removeItemFromCart(${item.cart_item_id})" title="Xóa khỏi giỏ">
+                <i class="fas fa-trash-alt"></i> Xóa
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('summarySubtotal').textContent = App.formatVND(subtotal);
+      document.getElementById('summaryTotal').textContent = App.formatVND(subtotal);
+      CartService.notifyUpdate();
+    }
+
+    function updateItemQuantity(cartItemId, newQty) {
+      CartService.updateQuantity(cartItemId, newQty);
+      loadCartData();
+    }
+
+    function removeItemFromCart(cartItemId) {
+      CartService.removeItem(cartItemId);
+      App.showToast('Đã xóa sản phẩm khỏi giỏ hàng!');
+      loadCartData();
+    }
+
+    function confirmClearCart() {
+      if (currentCartItems.length === 0) return;
+      if (confirm('Bạn có chắc chắn muốn xóa toàn bộ dịch vụ trong giỏ hàng không?')) {
+        CartService.clearCart();
+        App.showToast('Đã xóa sạch giỏ hàng!');
+        loadCartData();
+      }
+    }
+
+    // XỬ LÝ SUBMIT ĐĂNG KÝ
+    async function handleRegistration(event) {
+      event.preventDefault();
+
+      if (!currentCartItems || currentCartItems.length === 0) {
+        App.showToast('Giỏ hàng của bạn đang trống!', 'warning');
+        return;
+      }
+
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+      const email = document.getElementById('customerEmail').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+      const notes = document.getElementById('customerNotes').value.trim();
+
+      if (!name || !phone || !email) {
+        App.showToast('Vui lòng điền đầy đủ các thông tin bắt buộc (*)', 'warning');
+        return;
+      }
+
+      const summary = CartService.getSummary();
+      const bookingCode = 'VJ-' + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
+
+      // 1. Lưu vào bảng bookings trong SQLite
+      const insertBookingSql = `
+        INSERT INTO bookings (
+          booking_code, customer_name, customer_email, customer_phone,
+          customer_address, notes, total_amount, payment_method, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'BANK_TRANSFER', 'CONFIRMED')
+      `;
+      VietjetDB.run(insertBookingSql, [bookingCode, name, email, phone, address, notes, summary.totalAmount]);
+
+      // Lấy ID booking vừa tạo
+      const bookingRow = VietjetDB.query('SELECT * FROM bookings WHERE booking_code = ?', [bookingCode])[0];
+      const bookingId = bookingRow ? bookingRow.id : 1;
+
+      // 2. Lưu chi tiết từng mục vào bảng booking_details
+      lastBookingDetails = [];
+      currentCartItems.forEach(item => {
+        const detailSql = `
+          INSERT INTO booking_details (
+            booking_id, item_type, reference_id, item_name, ticket_class, quantity, unit_price, subtotal
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const className = (item.ticket_class === 'business') ? 'Hạng Thương Gia' : (item.item_type === 'flight' ? 'Hạng Phổ Thông' : 'Tiêu chuẩn');
+        VietjetDB.run(detailSql, [
+          bookingId, item.item_type, item.reference_id, item.item_title, className, item.quantity, item.unit_price, item.subtotal
+        ]);
+
+        lastBookingDetails.push({
+          item_name: item.item_title,
+          ticket_class: className,
+          quantity: item.quantity,
+          subtotal: item.subtotal
+        });
+      });
+
+      lastCreatedBooking = {
+        booking_code: bookingCode,
+        customer_name: name,
+        customer_email: email,
+        customer_phone: phone,
+        total_amount: summary.totalAmount
+      };
+
+      // 3. Xóa giỏ hàng trong SQLite
+      CartService.clearCart();
+      loadCartData();
+
+      // 4. Kích hoạt gửi email xác nhận từ nvhai061993@gmail.com đến khách hàng
+      await EmailService.sendBookingConfirmation(lastCreatedBooking, lastBookingDetails);
+
+      // 5. Hiển thị Modal Popup Hoàn thành
+      document.getElementById('successCustomerName').textContent = name;
+      document.getElementById('successBookingCode').textContent = 'Mã Đặt Chỗ: ' + bookingCode;
+      document.getElementById('successCustomerEmail').textContent = email;
+      document.getElementById('bookingSuccessModal').classList.add('active');
+
+      App.showToast('Đặt vé thành công! Email xác nhận đã được gửi đi.');
+    }
+
+    function openEmailPreviewModal() {
+      if (!lastCreatedBooking) return;
+      const html = EmailService.generateEmailContent(lastCreatedBooking, lastBookingDetails);
+      document.getElementById('emailPreviewContent').innerHTML = html;
+      document.getElementById('emailPreviewModal').classList.add('active');
+    }
+
+    function closeEmailPreviewModal() {
+      document.getElementById('emailPreviewModal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

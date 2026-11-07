@@ -1,0 +1,271 @@
+/* ====================================================================
+   VIETJET CART & CHECKOUT STYLES (assets/css/cart.css)
+   ==================================================================== */
+
+.cart-page-container {
+  margin: 40px 0 80px;
+}
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 36px;
+  align-items: flex-start;
+}
+
+/* CART ITEMS LIST */
+.cart-items-section {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-light);
+  padding: 30px;
+  box-shadow: var(--shadow-sm);
+}
+
+.cart-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1.5px solid var(--border-light);
+}
+
+.cart-header-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.btn-clear-all {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-clear-all:hover {
+  text-decoration: underline;
+}
+
+.cart-item-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.cart-item-card:last-child {
+  border-bottom: none;
+}
+
+.cart-item-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.cart-item-info h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.cart-item-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart-quantity-control {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.qty-btn {
+  background: var(--bg-light);
+  border: none;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.qty-btn:hover {
+  background: var(--border-dark);
+}
+
+.qty-display {
+  width: 38px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.cart-item-price-box {
+  text-align: right;
+  min-width: 140px;
+}
+
+.cart-item-subtotal {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.cart-item-unit-price {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.btn-remove-item {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  margin-left: 8px;
+  transition: color 0.2s;
+}
+
+.btn-remove-item:hover {
+  color: var(--primary);
+}
+
+/* EMPTY CART STATE */
+.empty-cart-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-cart-state i {
+  font-size: 64px;
+  color: var(--border-dark);
+  margin-bottom: 16px;
+}
+
+.empty-cart-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* CUSTOMER INFO & CHECKOUT SIDEBAR */
+.checkout-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-light);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 96px;
+}
+
+.checkout-card-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid var(--border-light);
+}
+
+.checkout-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.checkout-summary-row.total-row {
+  border-top: 2px dashed var(--border-light);
+  padding-top: 16px;
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.checkout-total-val {
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+/* SUCCESS MODAL POPUP */
+.success-check-icon {
+  width: 72px;
+  height: 72px;
+  background: #eafaf1;
+  color: #28a745;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 20px;
+}
+
+.booking-code-pill {
+  display: inline-block;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 800;
+  padding: 8px 24px;
+  border-radius: var(--radius-full);
+  margin: 12px 0 20px;
+  border: 1.5px dashed var(--primary);
+}
+
+.email-sent-notice {
+  background: #fdf8e6;
+  border: 1px solid #f8c200;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  font-size: 13.5px;
+  color: #7a5e00;
+  text-align: left;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .cart-layout {
+    grid-template-columns: 1fr;
+  }
+  .checkout-card {
+    position: static;
+  }
+  .cart-item-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
+  }
+  .cart-item-price-box {
+    text-align: center;
+  }
+}

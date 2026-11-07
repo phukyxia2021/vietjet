@@ -1,0 +1,472 @@
+/* ====================================================================
+   VIETJET FLIGHTS & FLIGHT DETAIL STYLES (assets/css/flights.css)
+   ==================================================================== */
+
+/* --- SEARCH SUMMARY BAR --- */
+.flight-search-bar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  padding: 16px 0;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 30px;
+}
+
+.search-summary-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.summary-route {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.summary-cities {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.summary-cities i {
+  color: var(--primary);
+  margin: 0 8px;
+  font-size: 16px;
+}
+
+.summary-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.summary-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- MAIN 2-COLUMN LAYOUT --- */
+.flights-layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 30px;
+  align-items: flex-start;
+  margin-bottom: 60px;
+}
+
+/* --- LEFT FILTER SIDEBAR --- */
+.filter-sidebar {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-light);
+  padding: 24px 20px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 96px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid var(--border-light);
+}
+
+.filter-header h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-reset-filter {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-reset-filter:hover {
+  text-decoration: underline;
+}
+
+.filter-group {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.filter-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.filter-group-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.filter-option label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.filter-option input[type="radio"],
+.filter-option input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+}
+
+/* --- RIGHT FLIGHT CARDS LIST --- */
+.flights-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.flights-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.flights-result-count {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.flight-card {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-light);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+  display: grid;
+  grid-template-columns: 180px 1fr 200px;
+  align-items: center;
+  gap: 24px;
+}
+
+.flight-card:hover {
+  border-color: rgba(238, 29, 35, 0.4);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.flight-airline-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.flight-airline-logo {
+  height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+.flight-airline-logo img {
+  max-height: 34px;
+  max-width: 140px;
+  object-fit: contain;
+}
+
+.flight-airline-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.flight-number-badge {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Timeline schedule */
+.flight-schedule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.schedule-point {
+  text-align: center;
+}
+
+.schedule-time {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.schedule-airport {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.flight-duration-track {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+}
+
+.duration-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.flight-track-line {
+  width: 100%;
+  height: 2px;
+  background: var(--border-dark);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flight-track-line i {
+  position: absolute;
+  color: var(--primary);
+  background: #ffffff;
+  padding: 0 4px;
+  font-size: 14px;
+}
+
+.flight-direct-tag {
+  font-size: 11px;
+  color: #28a745;
+  font-weight: 700;
+}
+
+.flight-services-tag {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Flight Price & Action */
+.flight-price-action {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  border-left: 1px dashed var(--border-light);
+  padding-left: 20px;
+}
+
+.price-starting-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.flight-price-main {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.flight-select-btn {
+  width: 100%;
+}
+
+/* --- CHI TIẾT CHUYẾN BAY (flight-detail.html) --- */
+.detail-overview-box {
+  background: #ffffff;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 40px;
+}
+
+.detail-route-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1.5px solid var(--border-light);
+  margin-bottom: 24px;
+}
+
+.aircraft-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-dark);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* FARE CLASS CARDS */
+.fare-classes-section {
+  margin-bottom: 50px;
+}
+
+.fare-classes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.fare-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-light);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.fare-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.fare-card.business-card {
+  border-color: #f8c200;
+  background: linear-gradient(180deg, #fffdf2 0%, #ffffff 100%);
+}
+
+.fare-card-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--secondary);
+  color: #1a1a1a;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.fare-card-header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.fare-card-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.fare-card-price {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.fare-card-price span {
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--text-muted);
+}
+
+.fare-features-list {
+  padding: 24px;
+  list-style: none;
+  flex-grow: 1;
+}
+
+.fare-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.fare-feature-item i {
+  color: #28a745;
+  margin-top: 3px;
+}
+
+.fare-card.business-card .fare-feature-item i {
+  color: #b08200;
+}
+
+.fare-card-footer {
+  padding: 20px 24px;
+  background: #ffffff;
+  border-top: 1px solid var(--border-light);
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .flights-layout {
+    grid-template-columns: 1fr;
+  }
+  .filter-sidebar {
+    position: static;
+  }
+  .flight-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .flight-airline-info {
+    align-items: center;
+  }
+  .flight-price-action {
+    border-left: none;
+    border-top: 1px dashed var(--border-light);
+    padding-left: 0;
+    padding-top: 16px;
+    align-items: center;
+  }
+  .fare-classes-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tìm Kiếm & Đặt Chuyến Bay | Vietjet</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/flights.css">
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="top-bar">
+    <div class="container">
+      <div>
+        <i class="fas fa-plane-departure" style="color: var(--primary);"></i> Hệ thống đặt vé máy bay trực tuyến giá tốt nhất - <strong>Vietjet</strong>
+      </div>
+      <div class="top-bar-links">
+        <a href="javascript:void(0)" onclick="VietjetDB.reloadFromDisk()" style="color: var(--primary); font-weight: 700;" title="Nhấn để nạp lại dữ liệu mới nhất từ file db.db"><i class="fas fa-sync-alt"></i> Đồng Bộ CSDL</a>
+        <a href="tel:19001886"><i class="fas fa-phone-alt"></i> Hotline: 1900 1886</a>
+        <a href="cart.html"><i class="fas fa-shopping-bag"></i> Giỏ Hàng (<span class="cart-badge" style="display:inline-block; position:static;">0</span>)</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo">
+        <img src="images/logo.jpg" alt="Vietjet Logo">
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="index.html"><i class="fas fa-home"></i> Trang Chủ</a></li>
+          <li class="nav-item active"><a href="flights.html"><i class="fas fa-plane"></i> Chuyến Bay</a></li>
+          <li class="nav-item"><a href="tours.html"><i class="fas fa-umbrella-beach"></i> Tour Du Lịch</a></li>
+          <li class="nav-item"><a href="cart.html"><i class="fas fa-shopping-bag"></i> Giỏ Hàng</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="hotline-pill">
+          <i class="fas fa-headset"></i> 1900 1886
+        </div>
+        <a href="cart.html" class="cart-btn" title="Xem giỏ hàng">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge">0</span>
+        </a>
+        <button class="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SEARCH SUMMARY BAR -->
+  <div class="flight-search-bar">
+    <div class="container">
+      <div class="search-summary-content">
+        <div class="summary-route">
+          <span class="summary-cities" id="routeDisplayTitle">
+            Tất cả các chặng bay <i class="fas fa-plane"></i> Toàn Quốc & Quốc Tế
+          </span>
+        </div>
+        <div class="summary-meta">
+          <span id="tripTypeDisplay"><i class="fas fa-ticket-alt"></i> Khứ Hồi / Một Chiều</span>
+          <span id="dateDisplay"><i class="far fa-calendar-alt"></i> Linh Hoạt</span>
+          <button class="btn btn-outline btn-sm" onclick="toggleQuickSearchModal()">
+            <i class="fas fa-edit"></i> Đổi Hành Trình
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN 2-COLUMN CONTENT -->
+  <div class="container">
+    <div class="flights-layout">
+
+      <!-- ==========================================
+           BÊN TRÁI: BỘ LỌC CHUYẾN BAY (FILTERS)
+           ========================================== -->
+      <aside class="filter-sidebar">
+        <div class="filter-header">
+          <h3><i class="fas fa-sliders-h" style="color: var(--primary);"></i> Bộ Lọc Tìm Kiếm</h3>
+          <button type="button" class="btn-reset-filter" onclick="resetAllFilters()">
+            <i class="fas fa-undo"></i> Đặt lại
+          </button>
+        </div>
+
+        <form id="filterForm" onchange="applyFilters()">
+          <!-- 1. Sắp xếp giá vé -->
+          <div class="filter-group">
+            <div class="filter-group-title">Sắp Xếp Giá Vé</div>
+            <div class="filter-option">
+              <label>
+                <input type="radio" name="sortPrice" value="asc" checked>
+                <span>Giá thấp nhất (Tăng dần)</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="radio" name="sortPrice" value="desc">
+                <span>Giá cao nhất (Giảm dần)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 2. Loại vé (Khứ hồi, Một chiều) -->
+          <div class="filter-group">
+            <div class="filter-group-title">Loại Vé</div>
+            <div class="filter-option">
+              <label>
+                <input type="radio" name="filterTrip" value="all" checked>
+                <span>Tất cả các loại vé</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="radio" name="filterTrip" value="oneway">
+                <span>Vé một chiều</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="radio" name="filterTrip" value="roundtrip">
+                <span>Vé khứ hồi</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. Số điểm dừng (Bay thẳng, Nhiều thành phố) -->
+          <div class="filter-group">
+            <div class="filter-group-title">Số Điểm Dừng</div>
+            <div class="filter-option">
+              <label>
+                <input type="checkbox" name="directFlight" id="directFlightCheck" value="1" checked>
+                <span>Bay thẳng (Direct)</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="checkbox" name="multiCity" id="multiCityCheck" value="1">
+                <span>Nhiều thành phố / Quá cảnh</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. Hãng hàng không -->
+          <div class="filter-group">
+            <div class="filter-group-title">Hãng Hàng Không</div>
+            <div id="airlineCheckboxesContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- 5. Thời gian cất cánh (Giờ) -->
+          <div class="filter-group">
+            <div class="filter-group-title">Thời Gian Cất Cánh</div>
+            <div class="filter-option">
+              <label>
+                <input type="checkbox" name="timeSlot" value="night">
+                <span>Sáng sớm (00:00 - 06:00)</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="checkbox" name="timeSlot" value="morning">
+                <span>Buổi sáng (06:00 - 12:00)</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="checkbox" name="timeSlot" value="afternoon">
+                <span>Buổi chiều (12:00 - 18:00)</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="checkbox" name="timeSlot" value="evening">
+                <span>Buổi tối (18:00 - 24:00)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 6. Hạng dịch vụ -->
+          <div class="filter-group">
+            <div class="filter-group-title">Hạng Dịch Vụ Hiển Thị</div>
+            <div class="filter-option">
+              <label>
+                <input type="radio" name="serviceClass" value="economy" checked>
+                <span>Hạng Phổ Thông (Eco)</span>
+              </label>
+            </div>
+            <div class="filter-option">
+              <label>
+                <input type="radio" name="serviceClass" value="business">
+                <span>Hạng Thương Gia (Business)</span>
+              </label>
+            </div>
+          </div>
+        </form>
+      </aside>
+
+      <!-- ==========================================
+           BÊN PHẢI: DANH SÁCH CÁC CHUYẾN BAY
+           ========================================== -->
+      <main class="flights-content">
+        <div class="flights-result-header">
+          <div class="flights-result-count">
+            Tìm thấy <span id="flightCount" style="color: var(--primary);">0</span> chuyến bay phù hợp
+          </div>
+          <div style="font-size: 13px; color: var(--text-muted);">
+            Giá đã bao gồm thuế & phí cơ bản
+          </div>
+        </div>
+
+        <!-- Flight Cards List -->
+        <div id="flightListContainer">
+          <div style="text-align: center; padding: 60px 20px;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 12px; color: var(--text-muted);">Đang tải dữ liệu chuyến bay từ SQLite...</p>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img src="images/logo.jpg" alt="Vietjet" style="max-height: 42px; background: #fff; padding: 4px; border-radius: 4px; margin-bottom: 14px;">
+          <p>Vietjet đồng hành cùng bạn trên mọi hành trình bay an toàn, tiện lợi và tiết kiệm.</p>
+        </div>
+        <div class="footer-col">
+          <h4>HỖ TRỢ</h4>
+          <ul class="footer-links">
+            <li><a href="flights.html">Tra cứu vé</a></li>
+            <li><a href="cart.html">Giỏ hàng</a></li>
+            <li><a href="#">Chính sách hoàn hủy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>LIÊN HỆ</h4>
+          <p>Hotline: 1900 1886<br>Email: nvhai061993@gmail.com</p>
+        </div>
+        <div class="footer-col">
+          <h4>TIÊU CHUẨN</h4>
+          <p>Dữ liệu chuyến bay truy vấn trực tiếp từ SQLite WebAssembly.</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2026 Vietjet Aviation. Nền tảng đặt vé không backend.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SQLite + Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <script src="assets/js/db-fallback.js"></script>
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    let allAirlines = [];
+    let currentFlights = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      App.setupNav();
+
+      try {
+        await VietjetDB.init();
+        loadAirlinesFilter();
+        readUrlParamsAndApply();
+        CartService.notifyUpdate();
+      } catch (err) {
+        console.error('Lỗi khởi tạo DB:', err);
+      }
+    });
+
+    // Nạp danh sách checkbox Hãng bay
+    function loadAirlinesFilter() {
+      allAirlines = VietjetDB.query('SELECT * FROM airlines ORDER BY id ASC');
+      const container = document.getElementById('airlineCheckboxesContainer');
+      const urlAirline = App.getUrlParam('airline');
+
+      container.innerHTML = allAirlines.map(airline => {
+        const isChecked = (!urlAirline || urlAirline.toUpperCase() === airline.code.toUpperCase()) ? 'checked' : '';
+        return `
+          <div class="filter-option">
+            <label>
+              <input type="checkbox" name="airlineCode" value="${airline.code}" ${isChecked}>
+              <span>${airline.name}</span>
+            </label>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Đọc tham số URL và cập nhật Header summary bar
+    function readUrlParamsAndApply() {
+      const from = App.getUrlParam('from');
+      const to = App.getUrlParam('to');
+      const depart = App.getUrlParam('depart');
+      const trip = App.getUrlParam('trip');
+
+      if (from || to) {
+        const fromCity = getCityName(from) || from || 'Toàn quốc';
+        const toCity = getCityName(to) || to || 'Toàn quốc';
+        document.getElementById('routeDisplayTitle').innerHTML = `
+          ${fromCity} <i class="fas fa-long-arrow-alt-right" style="color: var(--primary);"></i> ${toCity}
+        `;
+      }
+
+      if (depart) {
+        document.getElementById('dateDisplay').innerHTML = `<i class="far fa-calendar-alt"></i> Khởi hành: ${depart}`;
+      }
+
+      if (trip === 'oneway') {
+        document.getElementById('tripTypeDisplay').innerHTML = `<i class="fas fa-arrow-right"></i> Vé Một Chiều`;
+        const radioOne = document.querySelector('input[name="filterTrip"][value="oneway"]');
+        if (radioOne) radioOne.checked = true;
+      } else if (trip === 'roundtrip') {
+        document.getElementById('tripTypeDisplay').innerHTML = `<i class="fas fa-exchange-alt"></i> Vé Khứ Hồi`;
+        const radioRound = document.querySelector('input[name="filterTrip"][value="roundtrip"]');
+        if (radioRound) radioRound.checked = true;
+      }
+
+      applyFilters();
+    }
+
+    function getCityName(code) {
+      if (!code) return '';
+      const res = VietjetDB.query('SELECT city_name FROM airports WHERE code = ?', [code])[0];
+      return res ? res.city_name : code;
+    }
+
+    // Áp dụng bộ lọc và truy vấn SQLite
+    function applyFilters() {
+      const sortPrice = document.querySelector('input[name="sortPrice"]:checked').value; // asc hoặc desc
+      const serviceClass = document.querySelector('input[name="serviceClass"]:checked').value; // economy hoặc business
+      
+      const checkedAirlines = Array.from(document.querySelectorAll('input[name="airlineCode"]:checked')).map(el => el.value);
+      const checkedTimeSlots = Array.from(document.querySelectorAll('input[name="timeSlot"]:checked')).map(el => el.value);
+      const isDirectOnly = document.getElementById('directFlightCheck').checked;
+      const isMultiCity = document.getElementById('multiCityCheck').checked;
+
+      const from = App.getUrlParam('from');
+      const to = App.getUrlParam('to');
+
+      // Xây dựng câu truy vấn SQL động
+      let sql = `
+        SELECT 
+          f.*,
+          a.name AS airline_name,
+          a.code AS airline_code,
+          a.logo AS airline_logo,
+          orig.city_name AS origin_city,
+          orig.airport_name AS origin_airport,
+          dest.city_name AS destination_city,
+          dest.airport_name AS destination_airport
+        FROM flights f
+        JOIN airlines a ON f.airline_id = a.id
+        JOIN airports orig ON f.origin_code = orig.code
+        JOIN airports dest ON f.destination_code = dest.code
+        WHERE 1=1
+      `;
+      const params = [];
+
+      // Lọc điểm đi & đến nếu có
+      if (from) {
+        sql += ` AND f.origin_code = ?`;
+        params.push(from);
+      }
+      if (to) {
+        sql += ` AND f.destination_code = ?`;
+        params.push(to);
+      }
+
+      // Lọc hãng bay
+      if (checkedAirlines.length > 0) {
+        const placeholders = checkedAirlines.map(() => '?').join(',');
+        sql += ` AND a.code IN (${placeholders})`;
+        params.push(...checkedAirlines);
+      } else {
+        // Nếu không chọn hãng nào thì không hiện
+        sql += ` AND 1=0`;
+      }
+
+      // Lọc bay thẳng
+      if (isDirectOnly && !isMultiCity) {
+        sql += ` AND f.is_direct = 1`;
+      }
+
+      // Sắp xếp theo giá
+      const priceColumn = (serviceClass === 'business') ? 'f.price_business' : 'f.price_economy';
+      sql += ` ORDER BY ${priceColumn} ${sortPrice.toUpperCase()}`;
+
+      let flights = VietjetDB.query(sql, params);
+
+      // Lọc khung giờ ở phía client
+      if (checkedTimeSlots.length > 0) {
+        flights = flights.filter(f => {
+          const hour = parseInt(f.departure_time.split(':')[0], 10);
+          return checkedTimeSlots.some(slot => {
+            if (slot === 'night') return hour >= 0 && hour < 6;
+            if (slot === 'morning') return hour >= 6 && hour < 12;
+            if (slot === 'afternoon') return hour >= 12 && hour < 18;
+            if (slot === 'evening') return hour >= 18 && hour <= 24;
+            return false;
+          });
+        });
+      }
+
+      renderFlightCards(flights, serviceClass);
+    }
+
+    // Hiển thị danh sách card chuyến bay bên phải
+    function renderFlightCards(flights, serviceClass) {
+      const container = document.getElementById('flightListContainer');
+      document.getElementById('flightCount').textContent = flights.length;
+
+      if (!flights || flights.length === 0) {
+        container.innerHTML = `
+          <div style="background: #fff; padding: 60px 20px; border-radius: 12px; text-align: center; border: 1px solid var(--border-light);">
+            <i class="fas fa-plane-slash" style="font-size: 48px; color: var(--border-dark); margin-bottom: 16px;"></i>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">Không tìm thấy chuyến bay phù hợp</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Vui lòng thử bỏ bớt bộ lọc hoặc chọn ngày bay khác.</p>
+            <button class="btn btn-outline" onclick="resetAllFilters()">Xóa Bộ Lọc</button>
+          </div>
+        `;
+        return;
+      }
+
+      const departDateStr = App.getUrlParam('depart') || 'Hàng ngày';
+
+      container.innerHTML = flights.map(f => {
+        const price = (serviceClass === 'business') ? f.price_business : f.price_economy;
+        const className = (serviceClass === 'business') ? 'Hạng Thương Gia' : 'Hạng Phổ Thông';
+        const serviceSnippet = (serviceClass === 'business') ? (f.services_business || 'SkyBoss VIP') : (f.services_economy || '7kg hành lý');
+
+        return `
+          <div class="flight-card">
+            <!-- Thông tin Hãng & Số hiệu -->
+            <div class="flight-airline-info">
+              <div class="flight-airline-logo">
+                <img src="${f.airline_logo}" alt="${f.airline_name}" onerror="this.src='images/logo.jpg'">
+              </div>
+              <div class="flight-airline-name">${f.airline_name}</div>
+              <div class="flight-number-badge">
+                <i class="fas fa-hashtag"></i> ${f.flight_number} • ${f.aircraft_type}
+              </div>
+            </div>
+
+            <!-- Lộ trình & Thời gian bay -->
+            <div class="flight-schedule">
+              <div class="schedule-point">
+                <div class="schedule-time">${f.departure_time}</div>
+                <div class="schedule-airport">${f.origin_code} (${f.origin_city})</div>
+              </div>
+
+              <div class="flight-duration-track">
+                <div class="duration-text">${App.formatDuration(f.duration_minutes)}</div>
+                <div class="flight-track-line">
+                  <i class="fas fa-plane"></i>
+                </div>
+                <div class="flight-direct-tag">
+                  <i class="fas fa-check-circle"></i> Bay thẳng
+                </div>
+                <div class="flight-services-tag">
+                  <i class="fas fa-suitcase"></i> ${serviceSnippet}
+                </div>
+              </div>
+
+              <div class="schedule-point">
+                <div class="schedule-time">${f.arrival_time}</div>
+                <div class="schedule-airport">${f.destination_code} (${f.destination_city})</div>
+              </div>
+            </div>
+
+            <!-- Giá & Nút chọn -->
+            <div class="flight-price-action">
+              <div class="price-starting-label">${className} từ</div>
+              <div class="flight-price-main">${App.formatVND(price)}</div>
+              <a href="flight-detail.html?id=${f.id}&class=${serviceClass}&date=${departDateStr}" class="btn btn-primary flight-select-btn">
+                Chọn Chuyến Bay <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Đặt lại toàn bộ bộ lọc
+    function resetAllFilters() {
+      document.querySelector('input[name="sortPrice"][value="asc"]').checked = true;
+      document.querySelector('input[name="filterTrip"][value="all"]').checked = true;
+      document.getElementById('directFlightCheck').checked = true;
+      document.getElementById('multiCityCheck').checked = false;
+      document.querySelectorAll('input[name="airlineCode"]').forEach(el => el.checked = true);
+      document.querySelectorAll('input[name="timeSlot"]').forEach(el => el.checked = false);
+      document.querySelector('input[name="serviceClass"][value="economy"]').checked = true;
+      applyFilters();
+    }
+  </script>
+</body>
+</html>

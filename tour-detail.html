@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Tiết Tour Du Lịch & Lịch Trình | Vietjet</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/tours.css">
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="top-bar">
+    <div class="container">
+      <div>
+        <i class="fas fa-umbrella-beach" style="color: var(--primary);"></i> Đặt tour trọn gói Vietjet - Cam kết khởi hành đúng lịch & Dịch vụ chuẩn 4-5 sao
+      </div>
+      <div class="top-bar-links">
+        <a href="tel:19001886"><i class="fas fa-phone-alt"></i> 1900 1886</a>
+        <a href="cart.html"><i class="fas fa-shopping-bag"></i> Giỏ Hàng (<span class="cart-badge" style="display:inline-block; position:static;">0</span>)</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo">
+        <img src="images/logo.jpg" alt="Vietjet Logo">
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="index.html"><i class="fas fa-home"></i> Trang Chủ</a></li>
+          <li class="nav-item"><a href="flights.html"><i class="fas fa-plane"></i> Chuyến Bay</a></li>
+          <li class="nav-item active"><a href="tours.html"><i class="fas fa-umbrella-beach"></i> Tour Du Lịch</a></li>
+          <li class="nav-item"><a href="cart.html"><i class="fas fa-shopping-bag"></i> Giỏ Hàng</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="hotline-pill">
+          <i class="fas fa-headset"></i> 1900 1886
+        </div>
+        <a href="cart.html" class="cart-btn" title="Xem giỏ hàng">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="container" style="margin-top: 24px;">
+    <a href="tours.html" class="btn btn-outline btn-sm">
+      <i class="fas fa-arrow-left"></i> Quay lại danh sách Tour
+    </a>
+  </div>
+
+  <!-- TOUR DETAIL CONTENT CONTAINER -->
+  <div class="container tour-detail-container" id="tourDetailContainer">
+    <div style="text-align: center; padding: 60px 20px;">
+      <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+      <p style="margin-top: 12px; color: var(--text-muted);">Đang tải chi tiết tour từ SQLite db.db...</p>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div class="modal-overlay" id="addTourModal">
+    <div class="modal-box" style="text-align: center; padding: 36px 28px;">
+      <div style="width: 64px; height: 64px; background: #eafaf1; color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+        <i class="fas fa-check"></i>
+      </div>
+      <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Đã Thêm Tour Vào Giỏ Hàng!</h3>
+      <p style="color: var(--text-muted); margin-bottom: 24px;" id="tourModalSuccessMsg">
+        Tour du lịch của bạn đã được lưu vào hệ thống SQLite.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <a href="tours.html" class="btn btn-outline">
+          <i class="fas fa-search"></i> Xem Tour Khác
+        </a>
+        <a href="cart.html" class="btn btn-primary">
+          <i class="fas fa-shopping-cart"></i> Đến Giỏ Hàng & Đăng Ký
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none; padding:0;">
+        <div>© 2026 Vietjet Travel. Cơ sở dữ liệu SQLite client-side.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SQLite + Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <script src="assets/js/db-fallback.js"></script>
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    let currentTour = null;
+    let selectedQuantity = 1;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      App.setupNav();
+
+      try {
+        await VietjetDB.init();
+        loadTourDetail();
+        CartService.notifyUpdate();
+      } catch (err) {
+        console.error('Lỗi nạp tour detail:', err);
+      }
+    });
+
+    function loadTourDetail() {
+      const tourId = App.getUrlParam('id');
+      const container = document.getElementById('tourDetailContainer');
+
+      if (!tourId) {
+        container.innerHTML = `
+          <div style="background: #fff; padding: 40px; text-align: center; border-radius: 12px; border: 1px solid var(--border-light);">
+            <h3>Không tìm thấy mã Tour!</h3>
+            <a href="tours.html" class="btn btn-primary" style="margin-top: 16px;">Xem danh sách tour</a>
+          </div>
+        `;
+        return;
+      }
+
+      const sql = `
+        SELECT 
+          t.*,
+          a.name AS airline_name,
+          a.logo AS airline_logo,
+          a.hotline AS airline_hotline
+        FROM tours t
+        JOIN airlines a ON t.airline_id = a.id
+        WHERE t.id = ?
+      `;
+
+      const results = VietjetDB.query(sql, [tourId]);
+      if (!results || results.length === 0) {
+        container.innerHTML = `
+          <div style="background: #fff; padding: 40px; text-align: center; border-radius: 12px;">
+            <h3>Tour không tồn tại trong CSDL!</h3>
+            <a href="tours.html" class="btn btn-primary" style="margin-top: 16px;">Quay lại</a>
+          </div>
+        `;
+        return;
+      }
+
+      currentTour = results[0];
+      renderTourDetail(currentTour);
+    }
+
+    function renderTourDetail(t) {
+      const container = document.getElementById('tourDetailContainer');
+
+      // Parse JSON lịch trình các ngày
+      let itineraryList = [];
+      try {
+        itineraryList = JSON.parse(t.itinerary_json || '[]');
+      } catch (e) {
+        console.warn('Lỗi parse JSON lịch trình:', e);
+      }
+
+      const itineraryHtml = itineraryList.map(step => `
+        <div class="timeline-step">
+          <div class="timeline-marker">N${step.day}</div>
+          <div class="timeline-day-title">Ngày ${step.day}: ${step.title}</div>
+          <div class="timeline-day-desc">${step.desc}</div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="tour-detail-grid">
+          
+          <!-- CỘT TRÁI: THÔNG TIN CHI TIẾT & LỊCH TRÌNH -->
+          <div>
+            <div class="tour-detail-hero-box">
+              <img src="${t.thumbnail}" alt="${t.title}" class="tour-detail-image-main">
+              
+              <div class="tour-detail-header-info">
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                  <span class="badge badge-red">
+                    <i class="fas fa-map-marker-alt"></i> ${t.departure_city} ➔ ${t.destination_city}
+                  </span>
+                  <span class="badge badge-yellow">
+                    <i class="far fa-clock"></i> ${t.duration_days} Ngày ${t.duration_nights} Đêm
+                  </span>
+                </div>
+
+                <h1 class="tour-detail-title">${t.title}</h1>
+                <p style="font-size: 15px; color: var(--text-dark); line-height: 1.6;">${t.description}</p>
+
+                <!-- 4 Điểm nhấn chính: Điểm đi, đến, hãng bay, loại máy bay -->
+                <div class="tour-key-highlights">
+                  <div class="highlight-item">
+                    <i class="fas fa-plane-departure"></i>
+                    <div>
+                      <div class="highlight-text-label">Điểm Khởi Hành</div>
+                      <div class="highlight-text-value">${t.departure_city}</div>
+                    </div>
+                  </div>
+
+                  <div class="highlight-item">
+                    <i class="fas fa-plane-arrival"></i>
+                    <div>
+                      <div class="highlight-text-label">Điểm Đến</div>
+                      <div class="highlight-text-value">${t.destination_city}</div>
+                    </div>
+                  </div>
+
+                  <div class="highlight-item">
+                    <i class="fas fa-building"></i>
+                    <div>
+                      <div class="highlight-text-label">Hãng Hàng Không</div>
+                      <div class="highlight-text-value">${t.airline_name}</div>
+                    </div>
+                  </div>
+
+                  <div class="highlight-item">
+                    <i class="fas fa-plane"></i>
+                    <div>
+                      <div class="highlight-text-label">Loại Máy Bay</div>
+                      <div class="highlight-text-value">${t.aircraft_type}</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- LỊCH TRÌNH CHUYẾN ĐI (ITINERARY TIMELINE) -->
+            <div class="itinerary-section">
+              <div class="section-header" style="text-align: left; margin-bottom: 20px;">
+                <span class="section-tag"><i class="fas fa-calendar-alt"></i> LỊCH TRÌNH CHI TIẾT</span>
+                <h2 class="section-title">Hành Trình Khám Phá Từng Ngày</h2>
+              </div>
+
+              <div class="timeline-list">
+                ${itineraryHtml}
+              </div>
+            </div>
+
+            <!-- DỊCH VỤ BAO GỒM VÀ KHÔNG BAO GỒM -->
+            <div style="background: #fff; border-radius: 16px; border: 1.5px solid var(--border-light); padding: 32px; box-shadow: var(--shadow-sm);">
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--text-dark);">
+                <i class="fas fa-clipboard-check" style="color: #28a745;"></i> Dịch Vụ Bao Gồm Trong Tour
+              </h3>
+              <p style="font-size: 14px; line-height: 1.7; color: var(--text-dark); margin-bottom: 24px;">
+                ${t.services_included || 'Vé máy bay khứ hồi, khách sạn tiêu chuẩn, xe du lịch, ăn uống theo chương trình, bảo hiểm du lịch.'}
+              </p>
+
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--text-dark);">
+                <i class="fas fa-times-circle" style="color: var(--primary);"></i> Dịch Vụ Chưa Bao Gồm
+              </h3>
+              <p style="font-size: 14px; line-height: 1.7; color: var(--text-muted);">
+                ${t.services_excluded || 'Chi phí cá nhân ngoài chương trình, đồ uống phát sinh, tiền tip cho hướng dẫn viên.'}
+              </p>
+            </div>
+          </div>
+
+          <!-- CỘT PHẢI: HỘP ĐẶT TOUR & TÍNH TIỀN (STICKY SIDEBAR) -->
+          <aside class="tour-booking-sidebar-card">
+            <div class="tour-booking-price-header">
+              <span style="font-size: 13px; color: var(--text-muted); display: block;">Giá tour trọn gói / khách:</span>
+              <div class="tour-booking-price-val">${App.formatVND(t.price)}</div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label class="form-label">Số Lượng Khách (Vé):</label>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="changeQuantity(-1)" style="width: 38px; height: 38px; padding: 0;">-</button>
+                <span id="qtyValDisplay" style="font-size: 18px; font-weight: 800; min-width: 30px; text-align: center;">1</span>
+                <button type="button" class="btn btn-outline btn-sm" onclick="changeQuantity(1)" style="width: 38px; height: 38px; padding: 0;">+</button>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 16px; font-weight: 700; border-top: 1px dashed var(--border-light); padding-top: 14px;">
+              <span>Tổng Tạm Tính:</span>
+              <span id="subtotalDisplay" style="color: var(--primary); font-size: 20px; font-weight: 900;">${App.formatVND(t.price)}</span>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" style="padding: 14px 20px; font-size: 16px;" onclick="addCurrentTourToCart()">
+              <i class="fas fa-cart-plus"></i> CHỌN TOUR / ĐẶT NGAY
+            </button>
+
+            <div class="tour-booking-services-box">
+              <strong style="color: var(--text-dark);">Cam kết từ Vietjet:</strong>
+              <ul>
+                <li><i class="fas fa-check"></i> Đảm bảo giữ chỗ 100%</li>
+                <li><i class="fas fa-check"></i> Hỗ trợ đổi ngày linh hoạt</li>
+                <li><i class="fas fa-check"></i> Tư vấn viên liên hệ sau 15 phút</li>
+              </ul>
+            </div>
+
+            <div style="text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 16px;">
+              <i class="fas fa-phone-alt" style="color: var(--primary);"></i> Cần tư vấn gấp? Gọi <strong>1900 1886</strong>
+            </div>
+          </aside>
+
+        </div>
+      `;
+    }
+
+    function changeQuantity(delta) {
+      selectedQuantity = Math.max(1, selectedQuantity + delta);
+      document.getElementById('qtyValDisplay').textContent = selectedQuantity;
+      const total = currentTour.price * selectedQuantity;
+      document.getElementById('subtotalDisplay').textContent = App.formatVND(total);
+    }
+
+    // Thêm tour vào giỏ hàng SQLite
+    function addCurrentTourToCart() {
+      if (!currentTour) return;
+
+      const success = CartService.addTour(currentTour.id, selectedQuantity);
+      if (success) {
+        document.getElementById('tourModalSuccessMsg').innerHTML = `
+          Đã thêm <strong>${selectedQuantity} vé</strong> của tour <strong>${currentTour.title}</strong> vào Giỏ Hàng thành công!
+        `;
+        document.getElementById('addTourModal').classList.add('active');
+      } else {
+        App.showToast('Không thể thêm tour vào giỏ hàng!', 'error');
+      }
+    }
+  </script>
+</body>
+</html>
